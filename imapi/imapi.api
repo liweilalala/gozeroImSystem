@@ -1,15 +1,22 @@
 syntax = "v1"
 
-type Request {
-	Name string `path:"name,options=you|me"`
-}
+type (
+	SendMsgRequest {
+		ToUserId int64  `json:"toUserId"`
+		Content  string `json:"content"`
+	}
+	SendMsgResponse {
+		Id         int64  `json:"id"`
+		CreateTime int64  `json:"createTime"`
+		Content    string `json:"content"`
+	}
+)
 
-type Response {
-	Message string `json:"message"`
-}
-
+@server (
+	prefix: /v1/imapi
+)
 service imapi-api {
-	@handler ImapiHandler
-	get /from/:name (Request) returns (Response)
+	@handler SendMsgHandler
+	post /send/msg (SendMsgRequest) returns (SendMsgResponse)
 }
 
