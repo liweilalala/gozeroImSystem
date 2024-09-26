@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package edge;
+option go_package="./edge";
+
+message Request {
+  string ping = 1;
+}
+
+message Response {
+  string pong = 1;
+}
+
+service Edge {
+  rpc Ping(Request) returns(Response);
+}

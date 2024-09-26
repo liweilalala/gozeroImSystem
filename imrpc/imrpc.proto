@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package imrpc;
+option go_package="./imrpc";
+
+// goctl rpc protoc imrpc.proto --go_out=./ --go-grpc_out=./ --zrpc_out=. --style=go_zero
+
+service Imrpc {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+}
+
+message LoginRequest {
+  string token = 1; // 用户信息
+  string authorization = 2; // 校验信息
+  string sessionId = 3;
+}
+
+message LoginResponse {
+  bytes body = 1;
+}
+
+message LogoutRequest {
+  string token = 1;
+  string sessionId = 2;
+}
+
+message LogoutResponse {
+    bytes body = 1;
+}
