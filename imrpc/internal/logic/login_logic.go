@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"time"
 
 	"gozeroImSystem/imrpc/imrpc"
 	"gozeroImSystem/imrpc/internal/svc"
@@ -24,7 +25,19 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(in *imrpc.LoginRequest) (*imrpc.LoginResponse, error) {
-	// todo: add your logic here and delete this line
+	// TODO jwt验证
+	//err := jwt.NewReg(l.svcCtx.Config.AuthConfig.AccessSecret).VerifyToken(in.Token, in.Authorization)
+	//if err != nil {
+	//	logx.Errorf("[Login] jwt verify token req: %+v error: %v", in, err)
+	//	return nil, err
+	//}
+	// token和sessionId保存在缓存中，这里用的数据结构是sorted set
+	_, err := l.svcCtx.BizRedis.Zadd(in.Token, time.Now().UnixMilli(), in.SessionId)
+	if err != nil {
+		logx.Errorf("[Login] Zadd token: %s sessionId: %s  error: %v", in.Token, in.SessionId, err)
+		return nil, err
+	}
+	_ = l.svcCtx.BizRedis.Expire(in.Token, 3600)
 
 	return &imrpc.LoginResponse{}, nil
 }

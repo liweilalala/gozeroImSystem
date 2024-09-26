@@ -12,8 +12,8 @@ import (
 
 type KqWorker struct {
 	key    string
-	kqConf kq.KqConf
-	client *clientv3.Client
+	kqConf kq.KqConf        // 存储在etcd中kafka的配置信息
+	client *clientv3.Client // etcd的client
 }
 
 func NewKqWorker(key string, endpoints []string, kqConf kq.KqConf) *KqWorker {
@@ -21,6 +21,7 @@ func NewKqWorker(key string, endpoints []string, kqConf kq.KqConf) *KqWorker {
 		Endpoints:   endpoints,
 		DialTimeout: time.Second * 3,
 	}
+	// 建立一个etcd的连接
 	etcdClient, err := clientv3.New(cfg)
 	if err != nil {
 		panic(err)
@@ -71,6 +72,7 @@ func (q *KqWorker) register(value string) {
 		for {
 			select {
 			case keepResp, ok := <-keepRespChan:
+				// 如果channel被关闭，无法续约，就重新注册一个
 				if !ok {
 					logx.Infof("租约已经失效:%x", leaseId)
 					q.register(value)

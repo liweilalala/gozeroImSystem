@@ -6,7 +6,7 @@ SendChanSize: 1024
 Etcd:
   Hosts:
   - 127.0.0.1:2379
-  Key: edge.rpc
+  Key: "edge_01"
 IMRpc:
   Etcd:
     Hosts:

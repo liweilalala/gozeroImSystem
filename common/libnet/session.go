@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/zhoushuguang/zeroim/common/session"
+	"gozeroImSystem/common/session"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -39,7 +39,7 @@ func NewSession(manager *Manager, codec Codec, sendChanSize int) *Session {
 		codec:     codec,
 		manager:   manager,
 		closeChan: make(chan int),
-		id:        atomic.AddUint64(&globalSessionId, 1),
+		id:        atomic.AddUint64(&globalSessionId, 1), // id自增
 	}
 	if sendChanSize > 0 {
 		s.sendChan = make(chan Message, sendChanSize)
@@ -97,6 +97,7 @@ func (s *Session) Send(msg Message) error {
 		return s.codec.Send(msg)
 	}
 	select {
+	// 放入channel缓冲，异步发送
 	case s.sendChan <- msg:
 		return nil
 	default:
